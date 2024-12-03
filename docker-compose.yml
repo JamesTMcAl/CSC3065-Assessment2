@@ -1,0 +1,122 @@
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - qubeditor-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  frontend:
+    build: ./editor-frontend
+    ports:
+      - "8088:80"
+    networks:
+      - qubeditor-network
+    depends_on:
+      - proxy
+      - wordcount
+      - charcount
+      - vowelcount
+      - commacount
+      - palindrome
+      - uppercase
+
+  state-saving:
+    build: ./stateful-saving
+    ports:
+      - "3000:3000"
+    networks:
+      - qubeditor-network
+    depends_on:
+      - mongo
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+
+  proxy:
+    build: ./proxy
+    ports:
+      - "8085:8085"
+    networks:
+      - qubeditor-network
+    depends_on:
+      - wordcount
+      - charcount
+      - vowelcount
+      - commacount
+      - palindrome
+      - uppercase
+      - state-saving
+    environment:
+      EMAIL_USER: "mcalindenjames02@gmail.com"
+      EMAIL_PASS: "dppn qlqk gkwh gihe"
+
+  wordcount:
+    build: ./editor-wordcount
+    ports:
+      - "8081:80"
+    networks:
+      - qubeditor-network
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80?text=example"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  charcount:
+    build: ./editor-charcount
+    ports:
+      - "8084:80"
+    networks:
+      - qubeditor-network
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80?text=sampleText"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  vowelcount:
+    build: ./editor-vowelcount
+    ports:
+      - "5000:5000"
+    networks:
+      - qubeditor-network
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+
+  commacount:
+    build: ./comma-counter
+    ports:
+      - "8080:8080"
+    networks:
+      - qubeditor-network
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+
+  palindrome:
+    build: ./palindrome-counter
+    ports:
+      - "8082:8082"
+    networks:
+      - qubeditor-network
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+
+  uppercase:
+    build: ./uppercase-counter
+    ports:
+      - "4567:4567"
+    networks:
+      - qubeditor-network
+    environment:
+      CORS_ALLOWED_ORIGINS: "*"
+
+networks:
+  qubeditor-network:
+    driver: bridge

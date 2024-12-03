@@ -1,0 +1,12 @@
+{
+  "routes": {
+    "wordcount": "http://wordcount:80",
+    "charcount": "http://charcount:80",
+    "vowelcount": "http://vowelcount:5000/vowelcount",
+    "commacount": "http://commacount:8080/count-commas",
+    "palindrome": "http://palindrome:8082/palindromecount",
+    "uppercasecount": "http://uppercase:4567/uppercasecount",
+    "save-text": "http://state-saving:3000/save-text",
+    "get-text": "http://state-saving:3000/get-text"
+  }
+}
