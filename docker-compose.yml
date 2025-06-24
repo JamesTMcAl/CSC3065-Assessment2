@@ -1,14 +1,4 @@
 services:
-  mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    networks:
-      - qubeditor-network
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-
   frontend:
     build: ./editor-frontend
     ports:
@@ -31,7 +21,9 @@ services:
     networks:
       - qubeditor-network
     depends_on:
-      - mongo
+      - proxy
+    volumes:
+      - ./data:/usr/src/app/data 
     environment:
       CORS_ALLOWED_ORIGINS: "*"
 
@@ -48,7 +40,6 @@ services:
       - commacount
       - palindrome
       - uppercase
-      - state-saving
     environment:
       EMAIL_USER: "mcalindenjames02@gmail.com"
       EMAIL_PASS: "dppn qlqk gkwh gihe"
@@ -62,10 +53,11 @@ services:
     environment:
       CORS_ALLOWED_ORIGINS: "*"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80?text=example"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/?text=example"]
       interval: 30s
       timeout: 10s
       retries: 5
+
 
   charcount:
     build: ./editor-charcount

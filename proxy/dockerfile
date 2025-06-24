@@ -1,13 +1,19 @@
 FROM node:16
 
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
+
+# Install dependencies inside the container
 RUN npm install
 
+# Copy the rest of the application code, including proxy.mjs
 COPY . .
 
-# Expose the port if needed for monitoring service
+# Expose the application's port
 EXPOSE 8085
 
+# Change CMD to run proxy.mjs
 CMD ["node", "proxy.mjs"]

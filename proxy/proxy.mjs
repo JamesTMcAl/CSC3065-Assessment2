@@ -91,10 +91,10 @@ async function dynamicRouteHandler(req, res) {
         return res.status(404).json({ error: `Service ${service} not found.` });
     }
 
-    // Ensures 'text' parameter is present, add a default value if missing
     const queryParams = new URLSearchParams(req.query);
     if (!queryParams.has('text') || queryParams.get('text').trim() === "") {
-        queryParams.append('text', 'default text');  // Provides a default value
+        console.error(`Missing 'text' parameter for service ${service}.`);
+    return res.status(400).json({ error: "'text' parameter is required." });
     }
     targetUrl = `${targetUrl}?${queryParams.toString()}`;
 

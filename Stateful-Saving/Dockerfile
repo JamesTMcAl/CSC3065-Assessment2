@@ -1,20 +1,8 @@
-# Use an official Node.js runtime as a parent image
-FROM node:14
-
-# Set the working directory in the container
+# Dockerfile
+FROM node:16
 WORKDIR /usr/src/app
-
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
+RUN npm install --build-from-source   # Important to rebuild native modules correctly
 COPY . .
-
-# Expose the port that the server will run on
 EXPOSE 3000
-
-# Run the server
 CMD ["node", "server.js"]
