@@ -1,0 +1,13 @@
+image: php:7.2
+
+stages:
+  - test
+
+test:app:
+  stage: test
+  script:
+    - php -S 127.0.0.1:8000 -t src > server.log 2>&1 &
+    - sleep 5
+    - cat server.log # Debugging logs
+    - php src/test.php
+

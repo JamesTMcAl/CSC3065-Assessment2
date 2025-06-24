@@ -1,0 +1,30 @@
+
+image: golang:1.23
+
+stages:
+  - build
+  - test
+
+cache:
+  key: go-cache
+  paths:
+    - ~/.cache/go-build
+    - ~/go/pkg/mod
+
+build:
+  stage: build
+  script:
+    - go mod tidy   
+    - go build -o palindrome-counter
+  artifacts:
+    paths:
+      - palindrome-counter
+
+test:
+  stage: test
+  script:
+    - go mod tidy  
+    - go get -t ./...  
+    - go test ./...  
+
+

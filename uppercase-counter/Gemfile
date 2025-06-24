@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+
+gem 'sinatra'
+gem 'rack-test'
+gem 'puma' 
+gem 'rackup' 
+gem 'minitest'
+gem "json"
+

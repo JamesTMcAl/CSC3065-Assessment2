@@ -1,0 +1,8 @@
+{
+  "wordcountURL": "http://proxy:8085/wordcount",
+  "charcountURL": "http://proxy:8085/charcount",
+  "vowelcountURL": "http://proxy:8085/vowelcount",
+  "commacountURL": "http://proxy:8085/commacount",
+  "palindromeCountURL": "http://proxy:8085/palindrome",
+  "uppercaseCountURL": "http://proxy:8085/uppercasecount"
+}

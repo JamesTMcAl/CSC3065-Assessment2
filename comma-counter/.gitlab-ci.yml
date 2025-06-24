@@ -1,0 +1,29 @@
+image: maven:3.8.1-openjdk-17
+
+stages:
+  - build
+  - test
+
+cache:
+  key: maven-cache
+  paths:
+    - /root/.m2/repository/
+
+build:
+  stage: build
+  script:
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - target/
+  only:
+    - branches
+
+test:
+  stage: test
+  script:
+    - mvn test
+  dependencies:
+    - build
+  only:
+    - main

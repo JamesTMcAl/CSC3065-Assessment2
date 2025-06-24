@@ -1,0 +1,17 @@
+# Step 1: Use the official Ruby base image
+FROM ruby:3.2
+
+# Step 2: Set the working directory
+WORKDIR /app
+
+# Step 3: Copy the application files to the container
+COPY . .
+
+# Step 4: Install dependencies
+RUN bundle install
+
+# Step 5: Expose the port that Sinatra will use
+EXPOSE 4567
+
+# Step 6: Start the Sinatra app
+CMD ["ruby", "app.rb"]

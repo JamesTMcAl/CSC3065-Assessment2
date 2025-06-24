@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QUBeditotron3000</title>
+    <script type="text/javascript">
+        let isRequestInProgress = false;
+        const proxyURL = "http://localhost:8085";
+
+        // General reusable function to make requests to backend services via proxy
+        async function apiRequest(method, endpoint, data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    ...(data && { body: JSON.stringify(data) }),
+                };
+                const response = await fetch(`${proxyURL}/${endpoint}`, options);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                displayErrorMessage("Request failed", error.message);
+                throw error; // Re-throw the error so that request-specific code knows there was an error
+            }
+        }
+
+        // General function to make GET requests for specific services
+        async function makeRequest(service) {
+    if (isRequestInProgress) return;
+    const content = document.getElementById("content").value.trim();
+    if (!content) {
+        displayErrorMessage("Error", "Please enter some text to analyze.");
+        return;
+    }
+    
+    isRequestInProgress = true;
+    disableButtons();
+
+    try {
+        const response = await apiRequest("GET", `${service}?text=${encodeURIComponent(content)}`);
+        document.getElementById("output").value = response.answer;
+    } catch (error) {
+        // Error is already handled in `apiRequest`, no need to do anything here
+    } finally {
+        isRequestInProgress = false;
+        enableButtons();
+    }
+}
+
+
+        // Call the functions for different services
+        function Wordcount() {
+            makeRequest("wordcount");
+        }
+
+        function Charcount() {
+            makeRequest("charcount");
+        }
+
+        function Vowelcount() {
+            makeRequest("vowelcount");
+        }
+
+        function Commacount() {
+            makeRequest("commacount");
+        }
+
+        function Palindrome() {
+            makeRequest("palindrome");
+        }
+
+        function UppercaseCount() {
+            makeRequest("uppercasecount");
+        }
+
+        // Enable/Disable buttons
+        function disableButtons() {
+            const buttons = document.querySelectorAll('button.operation');
+            buttons.forEach(button => button.disabled = true);
+        }
+
+        function enableButtons() {
+            const buttons = document.querySelectorAll('button.operation');
+            buttons.forEach(button => button.disabled = false);
+        }
+
+        // Display error message
+        function displayErrorMessage(status, responseText) {
+            const outputElement = document.getElementById('output');
+            if (outputElement) {
+                outputElement.value = `Error ${status}: ${responseText}`;
+            } else {
+                console.error("Output element not found!");
+            }
+        }
+
+        // Save Text Endpoint
+        async function saveText() {
+            const content = document.getElementById('content').value.trim();
+            const identifier = document.getElementById('identifier').value.trim();
+            const data = { text: content, id: identifier };
+
+            try {
+                const response = await apiRequest("POST", "save-text", data);
+                document.getElementById("output").value = `Saved with ID: ${response.id}`;
+            } catch (error) {
+                // Error is already handled in `apiRequest`
+            }
+        }
+
+        // Retrieve Text Endpoint
+        async function retrieveText() {
+            const identifier = document.getElementById('identifier').value.trim();
+            if (!identifier) {
+                displayErrorMessage("Error", "Please enter an ID to retrieve text.");
+                return;
+            }
+
+            try {
+                const response = await apiRequest("GET", `get-text/${encodeURIComponent(identifier)}`);
+                document.getElementById("output").value = response.text;
+            } catch (error) {
+                // Error is already handled in `apiRequest`
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        body  {
+            font-size: 150%;
+            font-family: monospace;
+        }
+
+        #logo {
+            font-family: Calibri, sans-serif;
+            font-weight: lighter;
+            color: #505050;
+            margin: 0.5em;
+        }
+
+        #editor {
+            text-align: center;
+            margin-top: 1em;
+        }
+
+        #output {
+            font-size: 100%;
+            padding: 0.2em;
+            margin: 0.2em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+        }
+
+        #content {
+            font-size: 100%;
+            padding: 0.2em;
+            margin: 0.2em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+        }
+
+        .operation {
+            border: solid #d0d0d0 1px;
+            background-color: #f0f0f0;
+            padding: 1.5em;
+            margin: 1em;
+            width: 14em;
+        }
+
+        #identifier {
+            font-size: 100%;
+            padding: 0.2em;
+            margin: 0.2em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+            width: 40%;
+        }
+    </style>
+
+</head>
+<body>
+<div id="editor">
+    <div id="logo">
+        QUBeditotron3000
+    </div>
+    <div>
+        <textarea rows="5" cols="40" id="content">It was the best of cloud, it was the worst of cloud...</textarea>
+    </div>
+    <div>
+        <input type="text" id="output" readonly="1" value="" />
+    </div>
+    <div>
+        <button class="operation" onclick="Wordcount();">Word Count</button>
+        <button class="operation" onclick="Charcount();">Character Count</button>
+    </div>
+    <div>
+        <button class="operation" onclick="Vowelcount()">Vowel Count</button>
+        <button class="operation" onclick="Commacount()">Comma Count</button>
+    </div>
+    <div>
+        <button class="operation" onclick="Palindrome()">Palindrome Check</button>
+        <button class="operation" onclick="UppercaseCount()">Uppercase Count</button>
+    </div>
+    <div>
+        <input type="text" id="identifier" placeholder="Enter custom ID" />
+    </div>
+    <div>
+        <button class="operation" onclick="saveText()">Save Text</button>
+        <button class="operation" onclick="retrieveText()">Retrieve Text</button>
+    </div>
+</div>
+</body>
+</html>

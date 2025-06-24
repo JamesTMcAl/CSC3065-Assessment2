@@ -1,0 +1,39 @@
+# Use the official Go image to build the Go application
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /app
+
+# Copy the Go module files
+COPY go.mod go.sum ./
+
+# Download Go dependencies
+RUN go mod download
+
+# Copy the rest of the application
+COPY . . 
+
+# Install CORS module
+RUN go get github.com/gin-contrib/cors
+
+# Build the Go application
+RUN go build -o palindrome-counter
+
+# Use a smaller Alpine image for the final build
+FROM alpine:latest
+
+# Add a non-root user
+RUN adduser -D appuser
+
+WORKDIR /root/
+
+# Copy the compiled binary from the builder stage
+COPY --from=builder /app/palindrome-counter .
+
+# Switch to the non-root user
+USER appuser
+
+# Expose the application port
+EXPOSE 8082
+
+# Command to run the executable
+CMD ["./palindrome-counter"]
